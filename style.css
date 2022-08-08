@@ -1,0 +1,12 @@
+h1 {
+    animation-duration: 3s;
+    animation-name: slidein;
+  }
+  
+  @keyframes slidein {
+  
+    90% {
+      rotate: 360deg;
+    }
+  }
+  
