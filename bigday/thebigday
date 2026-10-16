@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Contagem regressiva — 23/12/2026</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1120;
+      --panel: rgba(20, 30, 49, .82);
+      --text: #f4f7fb;
+      --muted: #a8b4c7;
+      --accent: #73e0c1;
+      --border: rgba(255,255,255,.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 15%, rgba(61, 111, 166, .28), transparent 42%),
+        radial-gradient(ellipse at 85% 80%, rgba(43, 176, 145, .16), transparent 40%),
+        var(--bg);
+    }
+    main {
+      width: min(100%, 860px);
+      padding: clamp(24px, 6vw, 56px);
+      text-align: center;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.28);
+      backdrop-filter: blur(12px);
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .82rem;
+      font-weight: 750;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+    .subtitle {
+      margin: 18px 0 34px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      line-height: 1.6;
+    }
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(8px, 2vw, 16px);
+    }
+    .unit {
+      padding: clamp(14px, 3vw, 24px) 8px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.045);
+      min-width: 0;
+    }
+    .number {
+      display: block;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2rem, 7vw, 4.3rem);
+      line-height: 1;
+      font-weight: 780;
+      letter-spacing: -.05em;
+    }
+    .label {
+      display: block;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(.68rem, 1.8vw, .88rem);
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .target {
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .target strong { color: var(--text); font-weight: 650; }
+    #status {
+      min-height: 1.5em;
+      margin: 20px 0 0;
+      color: var(--accent);
+      font-weight: 650;
+    }
+    @media (max-width: 520px) {
+      body { padding: 14px; }
+      main { border-radius: 22px; padding: 28px 18px; }
+      .subtitle { margin-bottom: 24px; }
+      .countdown { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .unit { padding: 20px 8px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .unit { transition: border-color .2s ease, transform .2s ease; }
+      .unit:hover { border-color: rgba(115,224,193,.5); transform: translateY(-2px); }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Contagem regressiva</p>
+    <h1>O grande dia está chegando</h1>
+    <p class="subtitle">Falta pouco. Acompanhe o tempo restante até a data marcada.</p>
+
+    <section class="countdown" aria-label="Tempo restante">
+      <div class="unit"><span class="number" id="days">00</span><span class="label">Dias</span></div>
+      <div class="unit"><span class="number" id="hours">00</span><span class="label">Horas</span></div>
+      <div class="unit"><span class="number" id="minutes">00</span><span class="label">Minutos</span></div>
+      <div class="unit"><span class="number" id="seconds">00</span><span class="label">Segundos</span></div>
+    </section>
+
+    <p class="target">Data final: <strong>23 de dezembro de 2026, às 18h</strong></p>
+    <p class="target">Horário de Brasília (UTC−03:00)</p>
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    // O fuso -03:00 fica explícito para que o prazo não dependa do fuso do dispositivo.
+    const targetDate = new Date("2026-12-23T18:00:00-03:00").getTime();
+    const elements = {
+      days: document.getElementById("days"),
+      hours: document.getElementById("hours"),
+      minutes: document.getElementById("minutes"),
+      seconds: document.getElementById("seconds"),
+      status: document.getElementById("status")
+    };
+
+    function updateCountdown() {
+      const remaining = targetDate - Date.now();
+
+      if (remaining <= 0) {
+        elements.days.textContent = "00";
+        elements.hours.textContent = "00";
+        elements.minutes.textContent = "00";
+        elements.seconds.textContent = "00";
+        elements.status.textContent = "Chegou a hora!";
+        return;
+      }
+
+      const totalSeconds = Math.floor(remaining / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      elements.days.textContent = String(days).padStart(2, "0");
+      elements.hours.textContent = String(hours).padStart(2, "0");
+      elements.minutes.textContent = String(minutes).padStart(2, "0");
+      elements.seconds.textContent = String(seconds).padStart(2, "0");
+      elements.status.textContent = "";
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
